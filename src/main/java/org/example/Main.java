@@ -17,8 +17,8 @@ import java.net.URISyntaxException;
 
 public class Main {
     public static void main(String[] args) throws URISyntaxException {
-        String profile = "";    // replace your aws profile here
-        String channelArn = ""; // replace your channel arn here
+        String profile = "prod";    // replace your aws profile here
+        String channelArn = "arn:aws:kinesisvideo:ap-south-1:138850253999:channel/28249/1670656573326"; // replace your channel arn here
         ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.builder().profileName(profile).build();
         final KinesisVideoClient c  = KinesisVideoClient.builder().region(
                 Region.AP_SOUTH_1).credentialsProvider(credentialsProvider).build();
@@ -39,7 +39,7 @@ public class Main {
         GetIceServerConfigRequest ir = GetIceServerConfigRequest.builder().channelARN(channelArn).service("TURN").build();
         GetIceServerConfigResponse iresp = sc.getIceServerConfig(ir);
         System.out.println(iresp.iceServerList());
-
+        System.out.println("____________________________");
         System.out.println("Viewer");
         System.out.println("____________________________");
         ec = SingleMasterChannelEndpointConfiguration.builder().role(ChannelRole.VIEWER
@@ -47,8 +47,8 @@ public class Main {
         r = GetSignalingChannelEndpointRequest.builder().channelARN(
                 channelArn).singleMasterChannelEndpointConfiguration(ec).build();
         resp = c.getSignalingChannelEndpoint(r);
-        System.out.println(resp.resourceEndpointList());
-
+        System.out.println(resp.resourceEndpointList().get(0).resourceEndpoint());
+        System.out.println(resp.resourceEndpointList().get(1).resourceEndpoint());
         sc  = KinesisVideoSignalingClient.builder().endpointOverride(new URI(resp.resourceEndpointList().get(0).resourceEndpoint())).region(
                 Region.AP_SOUTH_1).credentialsProvider(credentialsProvider).build();
 
