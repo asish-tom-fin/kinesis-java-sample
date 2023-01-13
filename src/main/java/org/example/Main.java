@@ -22,13 +22,26 @@ public class Main {
         ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.builder().profileName(profile).build();
         final KinesisVideoClient c  = KinesisVideoClient.builder().region(
                 Region.AP_SOUTH_1).credentialsProvider(credentialsProvider).build();
+
+        System.out.println("Master");
+        System.out.println("____________________________");
         SingleMasterChannelEndpointConfiguration ec = SingleMasterChannelEndpointConfiguration.builder().role(ChannelRole.MASTER
         ).protocols(ChannelProtocol.WSS,ChannelProtocol.HTTPS).build();
         GetSignalingChannelEndpointRequest r = GetSignalingChannelEndpointRequest.builder().channelARN(
                 channelArn).singleMasterChannelEndpointConfiguration(ec).build();
         GetSignalingChannelEndpointResponse resp = c.getSignalingChannelEndpoint(r);
-        
+
         System.out.println(resp.resourceEndpointList().get(0).resourceEndpoint());
+        System.out.println(resp.resourceEndpointList().get(1).resourceEndpoint());
+        final KinesisVideoSignalingClient sc  = KinesisVideoSignalingClient.builder().endpointOverride(new URI(resp.resourceEndpointList().get(0).resourceEndpoint())).region(
+                Region.AP_SOUTH_1).credentialsProvider(credentialsProvider).build();
+
+        GetIceServerConfigRequest ir = GetIceServerConfigRequest.builder().channelARN(channelArn).service("TURN").build();
+        GetIceServerConfigResponse iresp = sc.getIceServerConfig(ir);
+        System.out.println(iresp.iceServerList());
+
+        System.out.println("Viewer");
+        System.out.println("____________________________");
         ec = SingleMasterChannelEndpointConfiguration.builder().role(ChannelRole.VIEWER
         ).protocols(ChannelProtocol.WSS,ChannelProtocol.HTTPS).build();
         r = GetSignalingChannelEndpointRequest.builder().channelARN(
@@ -44,7 +57,6 @@ public class Main {
         System.out.println(iresp.iceServerList());
         System.out.println(iresp.hasIceServerList());
         System.out.println(iresp.hasIceServerList());
-
     }
 }
 
