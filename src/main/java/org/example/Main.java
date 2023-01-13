@@ -11,9 +11,12 @@ import software.amazon.awssdk.services.kinesisvideo.model.GetSignalingChannelEnd
 import software.amazon.awssdk.services.kinesisvideosignaling.model.GetIceServerConfigRequest;
 import software.amazon.awssdk.services.kinesisvideosignaling.model.GetIceServerConfigResponse;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException {
         String profile = "";    // replace your aws profile here
         String channelArn = ""; // replace your channel arn here
         ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.builder().profileName(profile).build();
@@ -24,12 +27,22 @@ public class Main {
         GetSignalingChannelEndpointRequest r = GetSignalingChannelEndpointRequest.builder().channelARN(
                 channelArn).singleMasterChannelEndpointConfiguration(ec).build();
         GetSignalingChannelEndpointResponse resp = c.getSignalingChannelEndpoint(r);
+        System.out.println(resp.resourceEndpointList().get(0).resourceEndpoint());
+        ec = SingleMasterChannelEndpointConfiguration.builder().role(ChannelRole.VIEWER
+        ).protocols(ChannelProtocol.WSS,ChannelProtocol.HTTPS).build();
+        r = GetSignalingChannelEndpointRequest.builder().channelARN(
+                channelArn).singleMasterChannelEndpointConfiguration(ec).build();
+        resp = c.getSignalingChannelEndpoint(r);
         System.out.println(resp.resourceEndpointList());
-        final KinesisVideoSignalingClient sc  = KinesisVideoSignalingClient.builder().region(
+
+        final KinesisVideoSignalingClient sc  = KinesisVideoSignalingClient.builder().endpointOverride(new URI(resp.resourceEndpointList().get(0).resourceEndpoint())).region(
                 Region.AP_SOUTH_1).credentialsProvider(credentialsProvider).build();
-        GetIceServerConfigRequest ir = GetIceServerConfigRequest.builder().channelARN(channelArn).build();
+
+        GetIceServerConfigRequest ir = GetIceServerConfigRequest.builder().channelARN(channelArn).service("TURN").build();
         GetIceServerConfigResponse iresp = sc.getIceServerConfig(ir);
         System.out.println(iresp.iceServerList());
+        System.out.println(iresp.hasIceServerList());
+        System.out.println(iresp.hasIceServerList());
     }
 }
 
