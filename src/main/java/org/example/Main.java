@@ -33,7 +33,7 @@ public class Main {
 
         System.out.println(resp.resourceEndpointList().get(0).resourceEndpoint());
         System.out.println(resp.resourceEndpointList().get(1).resourceEndpoint());
-        final KinesisVideoSignalingClient sc  = KinesisVideoSignalingClient.builder().endpointOverride(new URI(resp.resourceEndpointList().get(0).resourceEndpoint())).region(
+        KinesisVideoSignalingClient sc  = KinesisVideoSignalingClient.builder().endpointOverride(new URI(resp.resourceEndpointList().get(0).resourceEndpoint())).region(
                 Region.AP_SOUTH_1).credentialsProvider(credentialsProvider).build();
 
         GetIceServerConfigRequest ir = GetIceServerConfigRequest.builder().channelARN(channelArn).service("TURN").build();
@@ -49,14 +49,13 @@ public class Main {
         resp = c.getSignalingChannelEndpoint(r);
         System.out.println(resp.resourceEndpointList());
 
-        final KinesisVideoSignalingClient sc  = KinesisVideoSignalingClient.builder().endpointOverride(new URI(resp.resourceEndpointList().get(0).resourceEndpoint())).region(
+        sc  = KinesisVideoSignalingClient.builder().endpointOverride(new URI(resp.resourceEndpointList().get(0).resourceEndpoint())).region(
                 Region.AP_SOUTH_1).credentialsProvider(credentialsProvider).build();
 
-        GetIceServerConfigRequest ir = GetIceServerConfigRequest.builder().channelARN(channelArn).service("TURN").build();
-        GetIceServerConfigResponse iresp = sc.getIceServerConfig(ir);
+        ir = GetIceServerConfigRequest.builder().channelARN(channelArn).service("TURN").build();
+        iresp = sc.getIceServerConfig(ir);
         System.out.println(iresp.iceServerList());
-        System.out.println(iresp.hasIceServerList());
-        System.out.println(iresp.hasIceServerList());
+
     }
 }
 
