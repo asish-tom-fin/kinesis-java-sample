@@ -27,6 +27,7 @@ public class Main {
         GetSignalingChannelEndpointRequest r = GetSignalingChannelEndpointRequest.builder().channelARN(
                 channelArn).singleMasterChannelEndpointConfiguration(ec).build();
         GetSignalingChannelEndpointResponse resp = c.getSignalingChannelEndpoint(r);
+        
         System.out.println(resp.resourceEndpointList().get(0).resourceEndpoint());
         ec = SingleMasterChannelEndpointConfiguration.builder().role(ChannelRole.VIEWER
         ).protocols(ChannelProtocol.WSS,ChannelProtocol.HTTPS).build();
@@ -43,6 +44,7 @@ public class Main {
         System.out.println(iresp.iceServerList());
         System.out.println(iresp.hasIceServerList());
         System.out.println(iresp.hasIceServerList());
+
     }
 }
 
