@@ -17,8 +17,8 @@ import java.net.URISyntaxException;
 
 public class Main {
     public static void main(String[] args) throws URISyntaxException {
-        String profile = "prod";    // replace your aws profile here
-        String channelArn = "arn:aws:kinesisvideo:ap-south-1:138850253999:channel/28249/1670656573326"; // replace your channel arn here
+        String profile = "";    // replace your aws profile here
+        String channelArn = ""; // replace your channel arn here
         ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.builder().profileName(profile).build();
         final KinesisVideoClient c  = KinesisVideoClient.builder().region(
                 Region.AP_SOUTH_1).credentialsProvider(credentialsProvider).build();
