@@ -1,0 +1,1 @@
+# kinesis-java-sample
