@@ -1,0 +1,56 @@
+version: 0.2
+
+env:
+  shell: bash
+
+  variables:
+    TARGET_PATH: "./"
+    ENABLE_LINT: 0
+    GO_VER: "1.18"
+    
+
+phases:
+  install:
+    #If you use the Ubuntu standard image 2.0 or later, you must specify runtime-versions.
+    #If you specify runtime-versions and use an image other than Ubuntu standard image 2.0, the build fails.
+    runtime-versions:
+      golang: 1.18
+
+    commands:
+      - go version
+      - go version | grep -q  $GO_VER  || time goenv install $GO_VER
+      - go version | grep -q  $GO_VER  || goenv local $GO_VER
+      - go version
+      - . aws-codebuild-extra
+      - make print-build-info
+      - echo "Phase install - ok!!!! "
+
+  pre_build:
+    commands:
+      - test $CODEBUILD_BUILD_SUCCEEDING -eq 0  && exit 1 || echo "Continue....."
+      - export NOW=`date '+%F_%H:%M:%S'`
+      - go version | grep -q  "go1.14" || time make tidy
+      - test $ENABLE_LINT -eq 0 || time make lint
+      - time make ormtagcheck ## enable this once all existing issues are fixed
+
+  build:
+    commands:
+      - test $CODEBUILD_BUILD_SUCCEEDING -eq 0  && exit 1 || echo "Continue....."
+      - time make -C $TARGET_PATH -j 8
+      - time make copy
+
+  post_build:
+    commands:
+      - test $CODEBUILD_BUILD_SUCCEEDING -eq 0  && exit 1 || echo "Continue....."
+      - echo "The folder in s3 Bucket is:" $CODEBUILD_UUID
+
+artifacts:
+  files:
+    - backend/dist/v1/*.zip
+    - backend/dist/v2/*.zip
+    - backend/dist/v3/*.zip
+    - backend/dist/md5.txt
+
+cache:
+  paths:
+    - '/go/pkg/**/*'    
